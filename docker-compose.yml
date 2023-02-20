@@ -24,12 +24,6 @@ services:
             - host.docker.internal:host-gateway
         links:
             - mysql
-    node:
-        image: node:14
-        tty: true
-        working_dir: /var/www/html
-        volumes:
-            - ./:/var/www/html
     mysql:
         image: mysql:5.7
         ports:

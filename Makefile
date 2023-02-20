@@ -1,6 +1,5 @@
-DC := docker-compose
+DC := docker compose
 FPM := $(DC) exec fpm
-NODE := $(DC) exec node
 ARTISAN := $(FPM) php artisan
 
 env:
@@ -27,15 +26,6 @@ ssh:
 composer-install:
 	@$(FPM) composer install
 
-node:
-	@$(NODE) /bin/bash
-
-yarn-install:
-	@$(NODE) yarn install
-
-yarn-watch:
-	@$(NODE) yarn run watch
-
 keygen:
 	@$(ARTISAN) key:generate
 
@@ -47,6 +37,6 @@ seed:
 
 start-expanded: start migrate seed
 
-refresh: composer-install yarn-install migrate seed
+refresh: composer-install migrate seed
 
-setup: env build start composer-install yarn-install
+setup: env build start composer-install
