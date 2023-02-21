@@ -16,7 +16,7 @@ class OrderSeeder extends Seeder
     {
         $ordersData = [
             [
-                'id'   => Order::ID_DEFAULT,
+                'id'      => Order::ID_DEFAULT,
                 'user_id' => User::ID_DEFAULT,
             ],
         ];
