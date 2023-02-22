@@ -46,4 +46,15 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Clean up related products before deleting an order
+     */
+    public static function boot() {
+        parent::boot();
+        
+        self::deleting(fn ($order) => $order->products()->each(
+            fn ($product) => $product->delete())
+        );
+    }
 }
