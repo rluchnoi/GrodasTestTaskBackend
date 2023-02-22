@@ -10,7 +10,7 @@ use App\Models\Order;
 class OrderRepository
 {
     /**
-     * Get user roles
+     * Get open order by user id
      */
     public function getOpenOrderByUserId(int $userId): Order|null
     {
