@@ -17,11 +17,18 @@ class Order extends Model
     const ID_DEFAULT = 1;
 
     /**
+     * Order statuses
+     */
+    const STATUS_OPEN = 1;
+    const STATUS_CLOSED = 2;
+
+    /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [
         'id',
         'user_id',
+        'status'
     ];
 
     /**
@@ -38,5 +45,16 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Clean up related products before deleting an order
+     */
+    public static function boot() {
+        parent::boot();
+        
+        self::deleting(fn ($order) => $order->products()->each(
+            fn ($product) => $product->delete())
+        );
     }
 }
