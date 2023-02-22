@@ -18,6 +18,7 @@ class OrderSeeder extends Seeder
             [
                 'id'      => Order::ID_DEFAULT,
                 'user_id' => User::ID_DEFAULT,
+                'status'  => Order::STATUS_CLOSED
             ],
         ];
 

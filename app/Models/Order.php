@@ -17,11 +17,18 @@ class Order extends Model
     const ID_DEFAULT = 1;
 
     /**
+     * Order statuses
+     */
+    const STATUS_OPEN = 1;
+    const STATUS_CLOSED = 2;
+
+    /**
      * The attributes that are mass assignable.
      */
     protected $fillable = [
         'id',
         'user_id',
+        'status'
     ];
 
     /**
