@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Repositories\OrderRepository;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -12,6 +13,13 @@ use Illuminate\Http\Response;
  */
 class ProductController extends Controller
 {
+    /**
+     * Construct
+     */
+    public function __construct(
+        private OrderRepository $orderRepository
+    ) {}
+
     /**
      * Display a listing of the resource.
      */
@@ -28,10 +36,10 @@ class ProductController extends Controller
     public function store(Request $request): Response
     {
         $userId = $request->get('user_id');
-        $order = Order::find($userId);
+        $order = $this->orderRepository->getOpenOrderByUserId($userId);
 
         // if there is no open order for a user - create a new one
-        if (!($order && $order->status === Order::STATUS_OPEN)) {
+        if (!$order) {
             $order = Order::create([
                 'user_id' => $userId,
                 'status'  => Order::STATUS_OPEN
