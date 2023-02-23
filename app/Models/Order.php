@@ -48,6 +48,22 @@ class Order extends Model
     }
 
     /**
+     * Check if order is open
+     */
+    public function isOpen(): bool
+    {
+        return $this->status === self::STATUS_OPEN;
+    }
+
+    /**
+     * Check if order is closed
+     */
+    public function isClosed(): bool
+    {
+        return $this->status === self::STATUS_CLOSED;
+    }
+
+    /**
      * Clean up related products before deleting an order
      */
     public static function boot() {

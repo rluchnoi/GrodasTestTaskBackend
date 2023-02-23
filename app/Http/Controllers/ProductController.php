@@ -3,9 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Repositories\OrderRepository;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Order;
 use App\Models\Product;
-use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 /**
@@ -33,10 +34,11 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request): Response
+    public function store(StoreProductRequest $request): Response
     {
-        $userId = $request->get('user_id');
-        $order = $this->orderRepository->getOpenOrderByUserId($userId);
+        $data   = $request->validated();
+        $userId = $data['user_id'];
+        $order  = $this->orderRepository->getOpenOrderByUserId($userId);
 
         // if there is no open order for a user - create a new one
         if (!$order) {
@@ -47,8 +49,8 @@ class ProductController extends Controller
         }
 
         $product = Product::create([
-            'name'     => $request->get('name'),
-            'price'    => $request->get('price'),
+            'name'     => $data['name'],
+            'price'    => $data['price'],
             'order_id' => $order->id
         ]);
 
@@ -70,9 +72,9 @@ class ProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Product $product): Response
+    public function update(UpdateProductRequest $request, Product $product): Response
     {
-        $data = $request->all();
+        $data = $request->validated();
         $product->update($data);
 
         return response([
