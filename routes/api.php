@@ -21,10 +21,24 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resources([
-    'products'   => ProductController::class,
-    'categories' => CategoryController::class
-]);
+Route::resource('products', ProductController::class)
+    ->missing(function () {
+        return model_binding_error_response();
+    });
 
-Route::post('orders/{order}/purchase', [OrderController::class, 'purchase']);
-Route::post('orders/{order}/cancel', [OrderController::class, 'cancel']);
+Route::resource('categories', CategoryController::class)
+    ->missing(function () {
+        return model_binding_error_response();
+    });
+    
+Route::group(['prefix' => 'orders/{order}'], function () {
+    Route::post('/purchase', [OrderController::class, 'purchase'])
+        ->missing(function () {
+            return model_binding_error_response();
+        });
+    Route::post('/cancel', [OrderController::class, 'cancel'])
+        ->missing(function () {
+            return model_binding_error_response();
+        });
+});
+

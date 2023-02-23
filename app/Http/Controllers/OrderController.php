@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\PurchaseOrderRequest;
 use App\Http\Services\Payment\Interfaces\PaymentServiceInterface;
 use App\Http\Services\Payment\PaymentDTO;
 use App\Models\Order;
-use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
 /**
@@ -23,14 +24,20 @@ class OrderController extends Controller
     /**
      * Purchase an order
      */
-    public function purchase(Order $order, Request $request): Response
+    public function purchase(Order $order, PurchaseOrderRequest $request): Response
     {
-        $cardNumber = $request->get('cardNumber');
-        $cardExpirationDate = $request->get('cardExpirationDate');
-        $cardCVV = $request->get('cardCVV');
+        if ($order->isClosed()) {
+            return response([
+                'error' => 'An order was already purchased'
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
 
-        $paymentDTO = new PaymentDTO($cardNumber, $cardExpirationDate, $cardCVV, $order);
-        $response = $this->paymentServiceInterface->purchase($paymentDTO);
+        $data               = $request->validated();
+        $cardExpirationDate = $data['cardExpirationDate'];
+        $cardNumber         = $data['cardNumber'];
+        $cardCVV            = $data['cardCVV'];
+        $paymentDTO         = new PaymentDTO($cardNumber, $cardExpirationDate, $cardCVV, $order);
+        $response           = $this->paymentServiceInterface->purchase($paymentDTO);
 
         return $response;
     }
@@ -40,6 +47,12 @@ class OrderController extends Controller
      */
     public function cancel(Order $order): Response
     {
+        if ($order->isClosed()) {
+            return response([
+                'error' => 'An order is already bought'
+            ], JsonResponse::HTTP_BAD_REQUEST);
+        }
+
         $order->delete();
 
         return response([
