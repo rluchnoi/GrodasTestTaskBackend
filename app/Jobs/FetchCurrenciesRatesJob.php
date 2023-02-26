@@ -30,19 +30,11 @@ class FetchCurrenciesRatesJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $response = Http::get('https://api.privatbank.ua/p24api/pubinfo?json&exchange&coursid=5');
+        $response = Http::get('https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json');
 
         if ($response->successful()) {
             $currencies = collect($response->json())
-                ->whereIn('ccy', ['USD', 'EUR'])
-                ->mapWithKeys(fn ($rate) => [ 
-                    $rate['ccy'] => [
-                        'name'              => $rate['ccy'],
-                        'buy_price_in_UAH'  => $rate['buy'],
-                        'sell_price_in_UAH' => $rate['sale'],
-                    ]
-                ]
-            );
+                ->whereIn('cc', config('currencies'));
 
             $this->save($currencies);
 
@@ -66,6 +58,11 @@ class FetchCurrenciesRatesJob implements ShouldQueue
     private function save(Collection $currencies): void
     {
         $currencies->map(fn ($currency) => 
-            Currency::updateOrCreate(['name' => $currency['name']], $currency));
+            Currency::updateOrCreate(['name' => $currency['cc']], [
+                'name'          => $currency['cc'],
+                'full_name'     => $currency['txt'],
+                'rate'          => $currency['rate'],
+                'exchange_date' => $currency['exchangedate']
+            ]));
     }
 }

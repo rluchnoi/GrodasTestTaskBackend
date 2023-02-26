@@ -30,7 +30,8 @@ class Product extends Model
         'id',
         'name',
         'order_id',
-        'price'
+        'price',
+        'currency_name'
     ];
 
     /**
@@ -47,5 +48,15 @@ class Product extends Model
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    /**
+     * Currency of the product
+     */
+    public function currency(): BelongsTo
+    {
+        return $this->belongsTo(Currency::class)->withDefault(function () {
+            return Currency::getDefault();
+        });
     }
 }

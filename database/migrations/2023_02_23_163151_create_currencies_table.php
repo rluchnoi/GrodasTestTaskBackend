@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('currencies', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->float('buy_price_in_UAH');
-            $table->float('sell_price_in_UAH');
+            $table->char('name', 3)->primary();
+            $table->float('rate');
+            $table->string('full_name');
+            $table->string('exchange_date');
         });
     }
 
