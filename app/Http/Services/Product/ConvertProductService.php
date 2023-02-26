@@ -17,6 +17,9 @@ class ConvertProductService
      */
     const ROUND_UNTIL = 3;
 
+    /**
+     * Convert product data
+     */
     public function convert(Product|Collection $data, string $currencyName)
     {
         $currencyExists = Currency::find($currencyName);
