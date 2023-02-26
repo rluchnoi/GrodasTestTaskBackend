@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Repositories\OrderRepository;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
+use App\Http\Services\Product\ConvertProductService;
 use App\Models\Order;
 use App\Models\Product;
+use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 
 /**
@@ -18,7 +21,8 @@ class ProductController extends Controller
      * Construct
      */
     public function __construct(
-        private OrderRepository $orderRepository
+        private OrderRepository $orderRepository,
+        private ConvertProductService $convertProductService,
     ) {}
 
     /**
@@ -26,8 +30,23 @@ class ProductController extends Controller
      */
     public function index(): Response
     {
+        $currency = request('currency');
+        $products = Product::all();
+
+        if ($currency) {
+            try {
+                return response([
+                    'products' => $this->convertProductService->convert($products, $currency)
+                ]);
+            } catch (Exception $e) {
+                return response([
+                    'error' => $e->getMessage()
+                ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        }
+
         return response([
-            'products' => Product::all()
+            'products' => $products
         ]);
     }
 
@@ -64,6 +83,20 @@ class ProductController extends Controller
      */
     public function show(Product $product): Response
     {
+        $currency = request('currency');
+
+        if ($currency) {
+            try {
+                return response([
+                    'product' => $this->convertProductService->convert($product, $currency)
+                ]);
+            } catch (Exception $e) {
+                return response([
+                    'error' => $e->getMessage()
+                ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+            }
+        }
+
         return response([
             'product' => $product
         ]);
